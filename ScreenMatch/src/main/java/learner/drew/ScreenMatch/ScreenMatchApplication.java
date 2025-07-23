@@ -1,12 +1,13 @@
 package learner.drew.ScreenMatch;
 
-import learner.drew.ScreenMatch.model.EpisodeData;
-import learner.drew.ScreenMatch.model.ShowData;
-import learner.drew.ScreenMatch.service.ApiConsumerService;
-import learner.drew.ScreenMatch.service.DataConverterService;
+
+import learner.drew.ScreenMatch.model.Main;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.security.Principal;
+
 
 @SpringBootApplication
 public class ScreenMatchApplication implements CommandLineRunner {
@@ -17,19 +18,16 @@ public class ScreenMatchApplication implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) throws Exception {
-
-		var consumoApi = new ApiConsumerService();
-		var endereco = consumoApi.obterDados("https://www.omdbapi.com/?t=gilmore+girls&&episode=1-&apikey=5a958904");
-		var converteDados = new DataConverterService();
-		ShowData data = converteDados.getData(endereco, ShowData.class);
-		System.out.println(data);
-		// TODO: Pegar os dados da api para um episode e consumir/mostrar no terminal
-		// Java 17
-		var episode = converteDados.getData(endereco, EpisodeData.class);
-		System.out.println(episode);
-
-
+		Main main = new Main();
+		main.menu();
 
 	}
+
+
+
+
+
+
+
 
 }
