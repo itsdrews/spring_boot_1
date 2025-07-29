@@ -3,9 +3,13 @@ package learner.drew.ScreenMatch.model;
 import learner.drew.ScreenMatch.service.ApiConsumerService;
 import learner.drew.ScreenMatch.service.DataConverterService;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Main {
 
@@ -28,14 +32,49 @@ public class Main {
 
         List<SeasonData> temporadas = new ArrayList<>();
 
-        for(int i=1;i<dados.numberOfSeasons();i++){
-            String enderecoNovo = ENDERECO + name + "&season=" + i+ API_KEY;
-            json = apiConsumerService.obterDados(enderecoNovo);
-            var dadosTemporada = dataConverterService.getData(json, SeasonData.class);
-            temporadas.add(dadosTemporada);
+        for(int i=0; i<dados.numberOfSeasons();i++){
+            int seasonNumber = i+1;
+            json = apiConsumerService.obterDados(ENDERECO+name+"&Season="+seasonNumber+API_KEY);
+            SeasonData season  = dataConverterService.getData(json, SeasonData.class);
+            temporadas.add(season);
         }
-        temporadas.forEach(System.out::println);
 
 
+        List<EpisodeData> episodios = temporadas.stream()
+                .flatMap(t -> t.listaDeEpisodios().stream())
+                .collect(Collectors.toList());
+
+        episodios.stream()
+                .filter(e -> !e.avaliacao().equalsIgnoreCase("N/A"))
+                .sorted(Comparator.comparing(EpisodeData::avaliacao)
+                .reversed())
+                .map(e -> e.titulo().toUpperCase())
+                .limit(10)
+                .forEach(System.out::println);
+
+        List<Episode> episodeList = temporadas.stream()
+                .flatMap(t -> t.listaDeEpisodios().stream()
+                        .map(d -> new Episode(t.numero(), d)))
+                .collect(Collectors.toList());
+
+       // episodeList.forEach(System.out::println);
+        /*
+        System.out.println("A partir de qual ano?");
+        var ano = sc.nextInt();
+        sc.nextLine();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate data = LocalDate.of(ano,1,1);
+        episodeList.stream()
+                .filter(e -> e.getReleaseDate() !=null && e.getReleaseDate().isAfter(data))
+                .forEach(e ->
+                        System.out.println(
+                                "Temporada: " + e.getSeason() +
+                                        ", Episódio: " + e.getTitle()+
+                                        ", Data de Lançamento: " + e.getReleaseDate().format(formatter)
+                        )
+
+                );
+
+    */
     }
 }
